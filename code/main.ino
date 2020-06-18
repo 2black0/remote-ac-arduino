@@ -21,6 +21,8 @@ DHT dht(DHTPIN, DHTTYPE);
 RTC_DS3231 rtc;
 File dataFile;
 IRsend irsend;
+ezButton button1(BUTTON1PIN);
+ezButton button2(BUTTON2PIN);
 
 // deklrasi variable
 int set_point = 25;
@@ -32,6 +34,7 @@ int atur_ac = 0;
 int h, t;
 String date, time, suhu_ac_C;
 String dataSimpan;
+String setDate, setTime;
 
 int count;
 int period = 1000;
@@ -61,8 +64,8 @@ void setup(){
 	// mengaktifkan fitur-fitur
 	Serial.begin(9600);
 	pinMode(CSPIN, OUTPUT);
-	pinMode(BUTTON1PIN, INPUT_PULLUP);
-  pinMode(BUTTON2PIN, INPUT_PULLUP);
+	button1.setDebounceTime(50);
+	button2.setDebounceTime(50);
   lcd.begin();
   lcd.backlight();
 	dht.begin();
@@ -71,13 +74,15 @@ void setup(){
 
 	// mencatat waktu compile
 	Serial.print("Compiled Time: ");
-	Serial.print(__DATE__);
-	Serial.println(__TIME__);
+	setDate = __DATE__;
+	setTime = __TIME__;
+	Serial.print(setDate);
+	Serial.println(setTime);
 
 	// set waktu RTC dengan waktu compile ketika RTC kehilangan daya
   if (rtc.lostPower()) {
     Serial.println("RTC lost power, let's set the time!");
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    rtc.adjust(DateTime(F(setDate), F(setTime)));
   }
 
 	// tampilan awal
@@ -85,12 +90,15 @@ void setup(){
 	Serial.println(F("********************"));
 	Serial.println(F("Program Pengatur Suhu Ruangan Otomatis berbasis Arduino dan DHT22"));
 	showLCD(1, 0, 0, "Program Pengatur", 0, 1, "Suhu Ruangan", 0, 2, "Otomatis Berbasis", 11, 3, "Arduino Mega", 2500);
-
-	cek_tombol(); // menunggu tombol rtc setting ditekan atau tidak
 }
 
 // fungsi loop
 void loop() {
+	button1.loop();
+	button2.loop();
+
+	cek_tombol(); // menunggu tombol rtc setting ditekan atau tidak
+
 	time_now = millis(); // ambil waktu mili second sekarang
 	showLCD(1, 0, 0, "", 0, 1, "", 0, 2, "", 0, 3, "", 1); // clear tampilan lcd
 
@@ -211,66 +219,66 @@ void set_ac_off() {
 	irsend.sendRaw(OFF, sizeof(OFF)/sizeof(int),khz);
 }
 
-// fungsi untuk setting rtc via button
+// fungsi untuk cek apakah masuk rtc setup atau tidak
 void cek_tombol() {
-	int button1State;
-	int button2State;
-	int readButton1;
-	int readButton2;
-	bool rtcStatus = 0;
+	while(1) {
+		if (button1.isPress()) { // cek tombol 1 ditekan = rtc setup
+			rtcSetup();
+			break;
+		}
+		if (button2.isPress()) { // cek tombol 2 ditekan = no rtc setup
+			break;
+		}
+	}
+}
 
-	unsigned long lastDebounceTime = 0;
-	unsigned long debounceDelay = 50; 
-
+// fungsu untuk setting rtc
+void rtcSetup() {
+	int cursorStatus = 1;
 	int hour = 0;
 	int minute = 0;
 	int second = 0;
-	int cursorStatus = 1;
 
-	while (1) {
-		readButton1 = digitalRead(BUTTON1PIN);
-		readButton2 = digitalRead(BUTTON2PIN);
+	while(1) {
+		showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100)
 
-		if(millis() - lastDebounceTime) > debounceDelay) {
-			if (readButton1 == LOW) {
-				rtcStatus = 1;
-				break;
-			}
+		// cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC
+		if (button1.isPress() && button2.isPress()) {
+			showLCD(1, 0, 0, "Setting RTC Done", 0, 1, "", 0, 2, "", 0, 3, "", 100)
+			break;
 		}
-			if (readButton2 == LOW) {
-				rtcStatus = 2;
-				break;
-			}
-	}
 
-	if (rtcStatus == 1) {
-		while (1) {
-			showLCD(1, 0, 0, "RTC Setup", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 1000);
-
-			readButton1 = digitalRead(BUTTON1PIN);
-			readButton2 = digitalRead(BUTTON2PIN);
-
-			if(millis() - lastDebounceTime) > debounceDelay) {
-				if (readButton1 == LOW) {
-					switch(cursorStatus){
-						case 1: hour=hour+1; break;
-						case 2: minute=minute+1; break;
-						case 3: second=second+1; break;
-					}
+		// cek tombol 1 ditekan? jika iya, naikkan nilai hour / minute / second tergantung nilai kursor
+		if (button1.isPress()) {
+			if (cursorStatus == 1) {
+				hour = hour + 1;
+				if (hour > 23) {
+					hour = 0;
 				}
 			}
-				if (readButton2 == LOW) {
-					cursorStatus = cursorStatus + 1;
-					if (cursorStatus > 3) {
-						cursorStatus = 1;
-					}
+			if (cursorStatus == 2) {
+				minute = minute + 1;
+				if (minute > 59) {
+					minute = 0;
+				}
+			}
+			if (cursorStatus == 3) {
+				second = second + 1;
+				if (minute > 59) {
+					minute = 0;
+				}
 			}
 		}
 
-		rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+		// cek tombol 2 ditekan? jika iya naikkan nilai kursor
+		if (button2.isPress()) {
+			cursorStatus = cursorStatus + 1;
+			if (cursorStatus > 3) {
+				cursorStatus = 1;
+			}
+		}
 	}
 
-	rtcContinue:
-	showLCD(1, 0, 0, "RTC no Setup", 0, 1, " ", 0, 2, " ", 0, 3, " ", 1000);
-	delay(10);
+	setTime = String(hour) + ":" + String(minute) + ":" + String(second);
+	rtc.adjust(DateTime(F(setDate), F(setTime)));
 }

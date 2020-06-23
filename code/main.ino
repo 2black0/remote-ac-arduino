@@ -11,8 +11,8 @@
 // definisi pin dan tipe dari DHT
 #define DHTPIN 8
 #define CSPIN 53
-#define BUTTON1PIN A2 // active low
-#define BUTTON2PIN A3 // active low
+#define BUTTON1PIN 2 // active low
+#define BUTTON2PIN 3 // active low
 #define DHTTYPE DHT22
 
 // instance name dari library yang dipakai

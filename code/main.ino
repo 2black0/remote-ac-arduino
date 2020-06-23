@@ -89,7 +89,7 @@ void setup(){
 	Serial.println("");
 	Serial.println(F("********************"));
 	Serial.println(F("Program Pengatur Suhu Ruangan Otomatis berbasis Arduino dan DHT22"));
-	showLCD(1, 0, 0, "Program Pengatur", 0, 1, "Suhu Ruangan", 0, 2, "Otomatis Berbasis", 11, 3, "Arduino Mega", 2500);
+	showLCD(1, 0, 0, "Program Pengatur", 0, 1, "Suhu Ruangan", 0, 2, "Otomatis Berbasis", 0, 3, "Arduino Mega", 2500);
 }
 
 // fungsi loop
@@ -221,6 +221,8 @@ void set_ac_off() {
 
 // fungsi untuk cek apakah masuk rtc setup atau tidak
 void cek_tombol() {
+	Serial.println(F("Tekan tombol 1 untuk Setting RTC dan 2 untuk Lanjut"));
+	showLCD(1, 0, 0, "Tekan 1: Set RTC", 0, 1, "Tekan 2: Lanjut", 0, 2, "", 0, 3, "", 2500);
 	while(1) {
 		if (button1.isPressed()) { // cek tombol 1 ditekan = rtc setup
 			rtcSetup();
@@ -243,8 +245,13 @@ void rtcSetup() {
 		showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100);
 
 		// cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC
-		if (button1.isPressed() && button2.isPressed()) {
-			showLCD(1, 0, 0, "Setting RTC Done", 0, 1, "", 0, 2, "", 0, 3, "", 100);
+		if (button1.isPressed() && button2.isPressed()) {	
+			showLCD(1, 0, 0, "Setting RTC Done", 0, 1, String(hour) + ":" + String(minute) + ":" String(second) + , 0, 2, "Tekan 1 Lanjut", 0, 3, "", 100);
+			while(1) {
+				if (button1.isPressed()){
+					break;
+				}
+			}
 			break;
 		}
 
@@ -255,12 +262,14 @@ void rtcSetup() {
 				if (hour > 23) {
 					hour = 0;
 				}
+				showLCD(1, 0, 0, "hour:", 0, 1, String(hour), 0, 2, "", 0, 3, "", 100);
 			}
 			if (cursorStatus == 2) {
 				minute = minute + 1;
 				if (minute > 59) {
 					minute = 0;
 				}
+				showLCD(1, 0, 0, "minute:", 0, 1, String(minute), 0, 2, "", 0, 3, "", 100);
 			}
 			if (cursorStatus == 3) {
 				second = second + 1;
@@ -268,6 +277,7 @@ void rtcSetup() {
 					second = 0;
 				}
 			}
+			showLCD(1, 0, 0, "second:", 0, 1, String(second), 0, 2, "", 0, 3, "", 100);
 		}
 
 		// cek tombol 2 ditekan? jika iya naikkan nilai kursor

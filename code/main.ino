@@ -73,16 +73,16 @@ void setup(){
 	SD.begin();
 
 	// mencatat waktu compile
-	Serial.print("Compiled Time: ");
+	/*Serial.print("Compiled Time: ");
 	setDate = __DATE__;
 	setTime = __TIME__;
-	Serial.print(setDate);
-	Serial.println(setTime);
+	Serial.print(F(__DATE__));
+	Serial.println(F(__TIME__));*/
 
 	// set waktu RTC dengan waktu compile ketika RTC kehilangan daya
   if (rtc.lostPower()) {
     Serial.println("RTC lost power, let's set the time!");
-    rtc.adjust(DateTime(F(setDate), F(setTime)));
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 
 	// tampilan awal
@@ -135,13 +135,13 @@ void loop() {
 	Serial.println(F("********************"));
 	Serial.print(F("Date: ")); Serial.println(date);
 	Serial.print(F("Time: ")); Serial.println(time);
-	Serial.print(F("Humidity: ")); Serial.print(h); Serial.println(F("%");
+	Serial.print(F("Humidity: ")); Serial.print(h); Serial.println(F("%"));
 	Serial.print(F("Temperature: "));	Serial.print(t); Serial.println(F("*C"));
 	Serial.print(F("AC Temperature: ")); Serial.println(suhu_ac_C);
 	Serial.println("");
 
 	// tampilan pada LCD
-	showLCD(0, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum: " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1;
+	showLCD(0, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum: " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
 	showLCD(0, 0, 0, "", 0, 1, "", 0, 2, "", 11, 3, "AC: " + suhu_ac_C, 1);
 
 	dataSimpan = date + ";" + time + ";" + String(h) + ";" + String(t) + ";" + String(atur_ac); // mengisi variable dataSimpan dengan data yang akan disimpan pada SDCard
@@ -222,11 +222,11 @@ void set_ac_off() {
 // fungsi untuk cek apakah masuk rtc setup atau tidak
 void cek_tombol() {
 	while(1) {
-		if (button1.isPress()) { // cek tombol 1 ditekan = rtc setup
+		if (button1.isPressed()) { // cek tombol 1 ditekan = rtc setup
 			rtcSetup();
 			break;
 		}
-		if (button2.isPress()) { // cek tombol 2 ditekan = no rtc setup
+		if (button2.isPressed()) { // cek tombol 2 ditekan = no rtc setup
 			break;
 		}
 	}
@@ -240,16 +240,16 @@ void rtcSetup() {
 	int second = 0;
 
 	while(1) {
-		showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100)
+		showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100);
 
 		// cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC
-		if (button1.isPress() && button2.isPress()) {
-			showLCD(1, 0, 0, "Setting RTC Done", 0, 1, "", 0, 2, "", 0, 3, "", 100)
+		if (button1.isPressed() && button2.isPressed()) {
+			showLCD(1, 0, 0, "Setting RTC Done", 0, 1, "", 0, 2, "", 0, 3, "", 100);
 			break;
 		}
 
 		// cek tombol 1 ditekan? jika iya, naikkan nilai hour / minute / second tergantung nilai kursor
-		if (button1.isPress()) {
+		if (button1.isPressed()) {
 			if (cursorStatus == 1) {
 				hour = hour + 1;
 				if (hour > 23) {
@@ -264,14 +264,14 @@ void rtcSetup() {
 			}
 			if (cursorStatus == 3) {
 				second = second + 1;
-				if (minute > 59) {
-					minute = 0;
+				if (second > 59) {
+					second = 0;
 				}
 			}
 		}
 
 		// cek tombol 2 ditekan? jika iya naikkan nilai kursor
-		if (button2.isPress()) {
+		if (button2.isPressed()) {
 			cursorStatus = cursorStatus + 1;
 			if (cursorStatus > 3) {
 				cursorStatus = 1;
@@ -279,6 +279,7 @@ void rtcSetup() {
 		}
 	}
 
-	setTime = String(hour) + ":" + String(minute) + ":" + String(second);
-	rtc.adjust(DateTime(F(setDate), F(setTime)));
+	DateTime now = rtc.now(); // mengambil waktu RTC
+	// rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+	rtc.adjust(DateTime(now.year(), now.month(), now.day(), hour, minute, second));
 }

@@ -221,15 +221,20 @@ void set_ac_off() {
 
 // fungsi untuk cek apakah masuk rtc setup atau tidak
 void cek_tombol() {
+	button1.loop();
+  button2.loop();
+
   Serial.println(F("Tekan tombol 1 untuk Setting RTC dan 2 untuk Lanjut"));
   showLCD(1, 0, 0, "Tekan 1: Set RTC", 0, 1, "Tekan 2: Lanjut", 0, 2, "", 0, 3, "", 1000);
   while(1) {
     if (button1.isReleased()) { // cek tombol 1 ditekan = rtc setup
-			rtcSetup();
-      break;
+			showLCD(1, 0, 0, "Tombol 1 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
+			//rtcSetup();
+      //break;
     }
     if (button2.isReleased()) { // cek tombol 2 ditekan = no rtc setup
-			break;
+			showLCD(1, 0, 0, "Tombol 2 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
+			//break;
     }
   }
 }

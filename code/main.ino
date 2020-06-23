@@ -140,7 +140,7 @@ void loop() {
   Serial.println("");
 
   // tampilan pada LCD
-  showLCD(0, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum : " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
+  showLCD(1, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum : " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
   showLCD(0, 0, 0, "", 0, 1, "", 0, 2, "", 11, 3, "AC: " + suhu_ac_C, 1);
 
   dataSimpan = date + ";" + time + ";" + String(h) + ";" + String(t) + ";" + String(atur_ac); // mengisi variable dataSimpan dengan data yang akan disimpan pada SDCard
@@ -148,7 +148,9 @@ void loop() {
 
   while(millis() < time_now + period){ // menunggu 1detik
 		if(status == 0) {
-			Serial.println("Menunggu 1 detik");
+			Serial.print("count: ");
+			Serial.println(count);
+			showLCD(0, 18, 0, String(count), 0, 1, "", 0, 2, "", 0, 3, "", 1);
 		}
 		status = 1;
   }

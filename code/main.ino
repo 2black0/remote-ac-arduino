@@ -36,6 +36,7 @@ String date, time;
 String suhu_ac_C = "AC OFF"; 
 String dataSimpan;
 String setDate, setTime;
+bool status;
 
 int count;
 int period = 1000;
@@ -146,8 +147,12 @@ void loop() {
   simpanSD(dataSimpan); // memanggil fungsi simpanSD dengan argument nilai dataSimpan
 
   while(millis() < time_now + period){ // menunggu 1detik
-		// gak ngapa2in
+		if(status == 0) {
+			Serial.println("Menunggu 1 detik");
+		}
+		status = 1;
   }
+	status = 0;
   count = count +1;
 }
 

@@ -32,7 +32,8 @@ int t_later = 0;
 int atur_ac = 0;
 
 int h, t;
-String date, time, suhu_ac_C;
+String date, time;
+String suhu_ac_C = "AC OFF"; 
 String dataSimpan;
 String setDate, setTime;
 
@@ -138,16 +139,16 @@ void loop() {
   Serial.println("");
 
   // tampilan pada LCD
-  showLCD(0, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum: " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
+  showLCD(0, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum : " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
   showLCD(0, 0, 0, "", 0, 1, "", 0, 2, "", 11, 3, "AC: " + suhu_ac_C, 1);
 
   dataSimpan = date + ";" + time + ";" + String(h) + ";" + String(t) + ";" + String(atur_ac); // mengisi variable dataSimpan dengan data yang akan disimpan pada SDCard
   simpanSD(dataSimpan); // memanggil fungsi simpanSD dengan argument nilai dataSimpan
 
   while(millis() < time_now + period){ // menunggu 1detik
-
+		// gak ngapa2in
   }
-  count = count +1 ;
+  count = count +1;
 }
 
 // fungsi tampilan LCD 20x4
@@ -267,14 +268,12 @@ void rtcSetup() {
         if (hour > 23) {
           hour = 0;
         }
-        showLCD(1, 0, 0, "hour:", 0, 1, String(hour), 0, 2, "", 0, 3, "", 100);
       }
       if (cursorStatus == 2) {
         minute = minute + 1;
         if (minute > 59) {
           minute = 0;
         }
-        showLCD(1, 0, 0, "minute:", 0, 1, String(minute), 0, 2, "", 0, 3, "", 100);
       }
       if (cursorStatus == 3) {
         second = second + 1;
@@ -282,7 +281,6 @@ void rtcSetup() {
           second = 0;
         }
       }
-      showLCD(1, 0, 0, "second:", 0, 1, String(second), 0, 2, "", 0, 3, "", 100);
     }
 
     // cek tombol 2 ditekan? jika iya naikkan nilai kursor

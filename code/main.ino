@@ -61,96 +61,96 @@ unsigned ON_30[] = {3400,1750,400,450,400,1350,350,500,400,450,400,450,400,450,4
 
 // fungsi setup
 void setup(){
-	// mengaktifkan fitur-fitur
-	Serial.begin(9600);
-	pinMode(CSPIN, OUTPUT);
-	button1.setDebounceTime(50);
-	button2.setDebounceTime(50);
+  // mengaktifkan fitur-fitur
+  Serial.begin(9600);
+  pinMode(CSPIN, OUTPUT);
+  button1.setDebounceTime(50);
+  button2.setDebounceTime(50);
   lcd.begin();
   lcd.backlight();
-	dht.begin();
-	rtc.begin();
-	SD.begin();
+  dht.begin();
+  rtc.begin();
+  SD.begin();
 
-	// mencatat waktu compile
-	/*Serial.print("Compiled Time: ");
-	setDate = __DATE__;
-	setTime = __TIME__;
-	Serial.print(F(__DATE__));
-	Serial.println(F(__TIME__));*/
+  // mencatat waktu compile
+  /*Serial.print("Compiled Time: ");
+  setDate = __DATE__;
+  setTime = __TIME__;
+  Serial.print(F(__DATE__));
+  Serial.println(F(__TIME__));*/
 
-	// set waktu RTC dengan waktu compile ketika RTC kehilangan daya
+  // set waktu RTC dengan waktu compile ketika RTC kehilangan daya
   if (rtc.lostPower()) {
     Serial.println("RTC lost power, let's set the time!");
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 
-	// tampilan awal
-	Serial.println("");
-	Serial.println(F("********************"));
-	Serial.println(F("Program Pengatur Suhu Ruangan Otomatis berbasis Arduino dan DHT22"));
-	showLCD(1, 0, 0, "Program Pengatur", 0, 1, "Suhu Ruangan", 0, 2, "Otomatis Berbasis", 0, 3, "Arduino Mega", 2500);
+  // tampilan awal
+  Serial.println("");
+  Serial.println(F("********************"));
+  Serial.println(F("Program Pengatur Suhu Ruangan Otomatis berbasis Arduino dan DHT22"));
+  showLCD(1, 0, 0, "Program Pengatur", 0, 1, "Suhu Ruangan", 0, 2, "Otomatis Berbasis", 0, 3, "Arduino Mega", 2500);
 }
 
 // fungsi loop
 void loop() {
-	button1.loop();
-	button2.loop();
+  button1.loop();
+  button2.loop();
 
-	cek_tombol(); // menunggu tombol rtc setting ditekan atau tidak
+  cek_tombol(); // menunggu tombol rtc setting ditekan atau tidak
 
-	time_now = millis(); // ambil waktu mili second sekarang
-	showLCD(1, 0, 0, "", 0, 1, "", 0, 2, "", 0, 3, "", 1); // clear tampilan lcd
+  time_now = millis(); // ambil waktu mili second sekarang
+  showLCD(1, 0, 0, "", 0, 1, "", 0, 2, "", 0, 3, "", 1); // clear tampilan lcd
 
-	DateTime now = rtc.now(); // mengambil waktu RTC
-	h = dht.readHumidity(); // baca humidity
-	t = dht.readTemperature(); // baca temperature
+  DateTime now = rtc.now(); // mengambil waktu RTC
+  h = dht.readHumidity(); // baca humidity
+  t = dht.readTemperature(); // baca temperature
 
-	date = String(now.day()) + "/" + String(now.month()) + "/" + String(now.year()); // menyimpan tanggal pada variable date
-	time = String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second()); // menyimpan waktu pada variable time
+  date = String(now.day()) + "/" + String(now.month()) + "/" + String(now.year()); // menyimpan tanggal pada variable date
+  time = String(now.hour()) + ":" + String(now.minute()) + ":" + String(now.second()); // menyimpan waktu pada variable time
 
-	if (count >= 30){ // update suhu AC tiap 30 detik
-		count = 0;
-		if (t > set_point) { // cek suhu apakah lebih dari set point
-			if (t == t_later) { // cek apakah suhu sama dengan suhu sebelumnya, apabila sama maka langsung keluar dari if
-				goto exit;
-			}
-			atur_ac = set_point - (t - set_point); // nilai atur_ac = 25 - (suhu terbaca - 25); misal suhu terbaca 30 maka, atur_ac = 25 - (30 - 25) = 20
-			suhu_ac_C = String(atur_ac) + "*C"; // variable suhu_ac_C digunakan untuk tampilan saja tentu sudah termasuk dengan simbol derajat
-			set_ac(atur_ac); // memanggil fungsi set_ac dengan argument nilai atur_ac
-			t_later = t; // menyimpan nilai suhu sekarang pada suhu_later agar nanti bisa digunakan untuk program diatas
-		}
-		else if (t <= low_temp) { // cek apakah suhu kurang dari 20
-			suhu_ac_C = "AC OFF"; // tampilan ke serial ataupun ke lcd
-			set_ac_off(); // memanggil fungsi set_ac_off yang digunakan untuk mematikan AC
-		}
-		else { // apabila suhu diantara 21-25 maka tidak mengerjakan apa2
-			suhu_ac_C = suhu_ac_C;
-		}
-	}
+  if (count >= 30){ // update suhu AC tiap 30 detik
+    count = 0;
+    if (t > set_point) { // cek suhu apakah lebih dari set point
+      if (t == t_later) { // cek apakah suhu sama dengan suhu sebelumnya, apabila sama maka langsung keluar dari if
+        goto exit;
+      }
+      atur_ac = set_point - (t - set_point); // nilai atur_ac = 25 - (suhu terbaca - 25); misal suhu terbaca 30 maka, atur_ac = 25 - (30 - 25) = 20
+      suhu_ac_C = String(atur_ac) + "*C"; // variable suhu_ac_C digunakan untuk tampilan saja tentu sudah termasuk dengan simbol derajat
+      set_ac(atur_ac); // memanggil fungsi set_ac dengan argument nilai atur_ac
+      t_later = t; // menyimpan nilai suhu sekarang pada suhu_later agar nanti bisa digunakan untuk program diatas
+    }
+    else if (t <= low_temp) { // cek apakah suhu kurang dari 20
+      suhu_ac_C = "AC OFF"; // tampilan ke serial ataupun ke lcd
+      set_ac_off(); // memanggil fungsi set_ac_off yang digunakan untuk mematikan AC
+    }
+    else { // apabila suhu diantara 21-25 maka tidak mengerjakan apa2
+      suhu_ac_C = suhu_ac_C;
+    }
+  }
 
-	exit:
-	// tampialn pada serial monitor
-	Serial.println("");
-	Serial.println(F("********************"));
-	Serial.print(F("Date: ")); Serial.println(date);
-	Serial.print(F("Time: ")); Serial.println(time);
-	Serial.print(F("Humidity: ")); Serial.print(h); Serial.println(F("%"));
-	Serial.print(F("Temperature: "));	Serial.print(t); Serial.println(F("*C"));
-	Serial.print(F("AC Temperature: ")); Serial.println(suhu_ac_C);
-	Serial.println("");
+  exit:
+  // tampialn pada serial monitor
+  Serial.println("");
+  Serial.println(F("********************"));
+  Serial.print(F("Date: ")); Serial.println(date);
+  Serial.print(F("Time: ")); Serial.println(time);
+  Serial.print(F("Humidity: ")); Serial.print(h); Serial.println(F("%"));
+  Serial.print(F("Temperature: ")); Serial.print(t); Serial.println(F("*C"));
+  Serial.print(F("AC Temperature: ")); Serial.println(suhu_ac_C);
+  Serial.println("");
 
-	// tampilan pada LCD
-	showLCD(0, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum: " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
-	showLCD(0, 0, 0, "", 0, 1, "", 0, 2, "", 11, 3, "AC: " + suhu_ac_C, 1);
+  // tampilan pada LCD
+  showLCD(0, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum: " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
+  showLCD(0, 0, 0, "", 0, 1, "", 0, 2, "", 11, 3, "AC: " + suhu_ac_C, 1);
 
-	dataSimpan = date + ";" + time + ";" + String(h) + ";" + String(t) + ";" + String(atur_ac); // mengisi variable dataSimpan dengan data yang akan disimpan pada SDCard
-	simpanSD(dataSimpan); // memanggil fungsi simpanSD dengan argument nilai dataSimpan
+  dataSimpan = date + ";" + time + ";" + String(h) + ";" + String(t) + ";" + String(atur_ac); // mengisi variable dataSimpan dengan data yang akan disimpan pada SDCard
+  simpanSD(dataSimpan); // memanggil fungsi simpanSD dengan argument nilai dataSimpan
 
-	while(millis() < time_now + period){ // menunggu 1detik
+  while(millis() < time_now + period){ // menunggu 1detik
 
-	}
-	count = count +1 ;
+  }
+  count = count +1 ;
 }
 
 // fungsi tampilan LCD 20x4
@@ -159,137 +159,137 @@ void loop() {
 // charax untuk kata yang akan ditampilkan
 // tdelay untuk jeda waktu tampil dalam ms
 void showLCD(bool clr, int r1, int c1, String chara1, int r2, int c2, String chara2, int r3, int c3, String chara3, int r4, int c4, String chara4, int tdelay) {
-	if (clr == 1){
-		lcd.clear();
-		delay(10);
-	}
-	lcd.setCursor(r1, c1); lcd.print(chara1);
-	lcd.setCursor(r2, c2); lcd.print(chara2);
-	lcd.setCursor(r3, c3); lcd.print(chara3);
-	lcd.setCursor(r4, c4); lcd.print(chara4);
-	delay(tdelay);
+  if (clr == 1){
+    lcd.clear();
+    delay(10);
+  }
+  lcd.setCursor(r1, c1); lcd.print(chara1);
+  lcd.setCursor(r2, c2); lcd.print(chara2);
+  lcd.setCursor(r3, c3); lcd.print(chara3);
+  lcd.setCursor(r4, c4); lcd.print(chara4);
+  delay(tdelay);
 }
 
 // fungsi untuk simpan data ke SDCard
 void simpanSD(String dataSimpan){
-	dataFile = SD.open("logger.txt", FILE_WRITE);
-	if (dataFile) {
+  dataFile = SD.open("logger.txt", FILE_WRITE);
+  if (dataFile) {
     dataFile.println(dataSimpan);
     dataFile.close();
     Serial.println(F("Save data to logger.txt in SDCard"));
   }
-	else {
+  else {
     Serial.println(F("Error opening logger.txt"));
   }
 }
 
 // fungsi untuk atur suhu AC
 void set_ac(int atur_ac){
-	if (atur_ac <= 16){
-		atur_ac = 1;
-	}
-	else if (atur_ac >= 30){
-		atur_ac = 15;
-	}
-	else {
-		atur_ac = atur_ac - 15;
-	}
+  if (atur_ac <= 16){
+    atur_ac = 1;
+  }
+  else if (atur_ac >= 30){
+    atur_ac = 15;
+  }
+  else {
+    atur_ac = atur_ac - 15;
+  }
 
-	switch(atur_ac){
-		case 1: irsend.sendRaw(ON_16, sizeof(OFF)/sizeof(int),khz);	break;
-		case 2: irsend.sendRaw(ON_17, sizeof(OFF)/sizeof(int),khz);	break;
-		case 3: irsend.sendRaw(ON_18, sizeof(OFF)/sizeof(int),khz);	break;
-		case 4: irsend.sendRaw(ON_19, sizeof(OFF)/sizeof(int),khz);	break;
-		case 5: irsend.sendRaw(ON_20, sizeof(OFF)/sizeof(int),khz);	break;
-		case 6: irsend.sendRaw(ON_21, sizeof(OFF)/sizeof(int),khz);	break;
-		case 7: irsend.sendRaw(ON_22, sizeof(OFF)/sizeof(int),khz);	break;
-		case 8: irsend.sendRaw(ON_23, sizeof(OFF)/sizeof(int),khz);	break;
-		case 9: irsend.sendRaw(ON_24, sizeof(OFF)/sizeof(int),khz);	break;
-		case 10: irsend.sendRaw(ON_25, sizeof(OFF)/sizeof(int),khz); break;
-		case 11: irsend.sendRaw(ON_26, sizeof(OFF)/sizeof(int),khz); break;
-		case 12: irsend.sendRaw(ON_27, sizeof(OFF)/sizeof(int),khz); break;
-		case 13: irsend.sendRaw(ON_28, sizeof(OFF)/sizeof(int),khz); break;
-		case 14: irsend.sendRaw(ON_29, sizeof(OFF)/sizeof(int),khz); break;						
-		case 15: irsend.sendRaw(ON_30, sizeof(OFF)/sizeof(int),khz); break;
-	}
+  switch(atur_ac){
+    case 1: irsend.sendRaw(ON_16, sizeof(OFF)/sizeof(int),khz); break;
+    case 2: irsend.sendRaw(ON_17, sizeof(OFF)/sizeof(int),khz); break;
+    case 3: irsend.sendRaw(ON_18, sizeof(OFF)/sizeof(int),khz); break;
+    case 4: irsend.sendRaw(ON_19, sizeof(OFF)/sizeof(int),khz); break;
+    case 5: irsend.sendRaw(ON_20, sizeof(OFF)/sizeof(int),khz); break;
+    case 6: irsend.sendRaw(ON_21, sizeof(OFF)/sizeof(int),khz); break;
+    case 7: irsend.sendRaw(ON_22, sizeof(OFF)/sizeof(int),khz); break;
+    case 8: irsend.sendRaw(ON_23, sizeof(OFF)/sizeof(int),khz); break;
+    case 9: irsend.sendRaw(ON_24, sizeof(OFF)/sizeof(int),khz); break;
+    case 10: irsend.sendRaw(ON_25, sizeof(OFF)/sizeof(int),khz); break;
+    case 11: irsend.sendRaw(ON_26, sizeof(OFF)/sizeof(int),khz); break;
+    case 12: irsend.sendRaw(ON_27, sizeof(OFF)/sizeof(int),khz); break;
+    case 13: irsend.sendRaw(ON_28, sizeof(OFF)/sizeof(int),khz); break;
+    case 14: irsend.sendRaw(ON_29, sizeof(OFF)/sizeof(int),khz); break;           
+    case 15: irsend.sendRaw(ON_30, sizeof(OFF)/sizeof(int),khz); break;
+  }
 }
 
 // fungsi untuk mematikan AC
 void set_ac_off() {
-	irsend.sendRaw(OFF, sizeof(OFF)/sizeof(int),khz);
+  irsend.sendRaw(OFF, sizeof(OFF)/sizeof(int),khz);
 }
 
 // fungsi untuk cek apakah masuk rtc setup atau tidak
 void cek_tombol() {
-	Serial.println(F("Tekan tombol 1 untuk Setting RTC dan 2 untuk Lanjut"));
-	showLCD(1, 0, 0, "Tekan 1: Set RTC", 0, 1, "Tekan 2: Lanjut", 0, 2, "", 0, 3, "", 2500);
-	while(1) {
-		if (button1.isPressed()) { // cek tombol 1 ditekan = rtc setup
-			rtcSetup();
-			break;
-		}
-		if (button2.isPressed()) { // cek tombol 2 ditekan = no rtc setup
-			break;
-		}
-	}
+  Serial.println(F("Tekan tombol 1 untuk Setting RTC dan 2 untuk Lanjut"));
+  showLCD(1, 0, 0, "Tekan 1: Set RTC", 0, 1, "Tekan 2: Lanjut", 0, 2, "", 0, 3, "", 2500);
+  while(1) {
+    if (button1.isPressed()) { // cek tombol 1 ditekan = rtc setup
+      rtcSetup();
+      break;
+    }
+    if (button2.isPressed()) { // cek tombol 2 ditekan = no rtc setup
+      break;
+    }
+  }
 }
 
 // fungsu untuk setting rtc
 void rtcSetup() {
-	int cursorStatus = 1;
-	int hour = 0;
-	int minute = 0;
-	int second = 0;
+  int cursorStatus = 1;
+  int hour = 0;
+  int minute = 0;
+  int second = 0;
 
-	while(1) {
-		showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100);
+  while(1) {
+    showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100);
 
-		// cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC
-		if (button1.isPressed() && button2.isPressed()) {	
-			showLCD(1, 0, 0, "Setting RTC Done", 0, 1, String(hour) + ":" + String(minute) + ":" String(second) + , 0, 2, "Tekan 1 Lanjut", 0, 3, "", 100);
-			while(1) {
-				if (button1.isPressed()){
-					break;
-				}
-			}
-			break;
-		}
+    // cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC
+    if (button1.isPressed() && button2.isPressed()) { 
+      showLCD(1, 0, 0, "Setting RTC Done", 0, 1, String(hour) + ":" + String(minute) + ":" + String(second), 0, 2, "Tekan 1 Lanjut", 0, 3, "", 100);
+      while(1) {
+        if (button1.isPressed()){
+          break;
+        }
+      }
+      break;
+    }
 
-		// cek tombol 1 ditekan? jika iya, naikkan nilai hour / minute / second tergantung nilai kursor
-		if (button1.isPressed()) {
-			if (cursorStatus == 1) {
-				hour = hour + 1;
-				if (hour > 23) {
-					hour = 0;
-				}
-				showLCD(1, 0, 0, "hour:", 0, 1, String(hour), 0, 2, "", 0, 3, "", 100);
-			}
-			if (cursorStatus == 2) {
-				minute = minute + 1;
-				if (minute > 59) {
-					minute = 0;
-				}
-				showLCD(1, 0, 0, "minute:", 0, 1, String(minute), 0, 2, "", 0, 3, "", 100);
-			}
-			if (cursorStatus == 3) {
-				second = second + 1;
-				if (second > 59) {
-					second = 0;
-				}
-			}
-			showLCD(1, 0, 0, "second:", 0, 1, String(second), 0, 2, "", 0, 3, "", 100);
-		}
+    // cek tombol 1 ditekan? jika iya, naikkan nilai hour / minute / second tergantung nilai kursor
+    if (button1.isPressed()) {
+      if (cursorStatus == 1) {
+        hour = hour + 1;
+        if (hour > 23) {
+          hour = 0;
+        }
+        showLCD(1, 0, 0, "hour:", 0, 1, String(hour), 0, 2, "", 0, 3, "", 100);
+      }
+      if (cursorStatus == 2) {
+        minute = minute + 1;
+        if (minute > 59) {
+          minute = 0;
+        }
+        showLCD(1, 0, 0, "minute:", 0, 1, String(minute), 0, 2, "", 0, 3, "", 100);
+      }
+      if (cursorStatus == 3) {
+        second = second + 1;
+        if (second > 59) {
+          second = 0;
+        }
+      }
+      showLCD(1, 0, 0, "second:", 0, 1, String(second), 0, 2, "", 0, 3, "", 100);
+    }
 
-		// cek tombol 2 ditekan? jika iya naikkan nilai kursor
-		if (button2.isPressed()) {
-			cursorStatus = cursorStatus + 1;
-			if (cursorStatus > 3) {
-				cursorStatus = 1;
-			}
-		}
-	}
+    // cek tombol 2 ditekan? jika iya naikkan nilai kursor
+    if (button2.isPressed()) {
+      cursorStatus = cursorStatus + 1;
+      if (cursorStatus > 3) {
+        cursorStatus = 1;
+      }
+    }
+  }
 
-	DateTime now = rtc.now(); // mengambil waktu RTC
-	// rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-	rtc.adjust(DateTime(now.year(), now.month(), now.day(), hour, minute, second));
+  DateTime now = rtc.now(); // mengambil waktu RTC
+  // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
+  rtc.adjust(DateTime(now.year(), now.month(), now.day(), hour, minute, second));
 }

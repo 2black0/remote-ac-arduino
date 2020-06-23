@@ -226,12 +226,12 @@ void cek_tombol() {
 
     if (button1.isReleased()) { // cek tombol 1 ditekan = rtc setup
 			showLCD(1, 0, 0, "Tombol 1 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
-			//rtcSetup();
-      //break;
+			rtcSetup();
+      break;
     }
     if (button2.isReleased()) { // cek tombol 2 ditekan = no rtc setup
 			showLCD(1, 0, 0, "Tombol 2 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
-			//break;
+			break;
     }
   }
 }
@@ -246,7 +246,7 @@ void rtcSetup() {
   while(1) {
 		button1.loop();
 		button2.loop();
-		
+
     showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100);
 
     // cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC

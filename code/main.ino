@@ -225,13 +225,11 @@ void cek_tombol() {
   showLCD(1, 0, 0, "Tekan 1: Set RTC", 0, 1, "Tekan 2: Lanjut", 0, 2, "", 0, 3, "", 1000);
   while(1) {
     if (button1.isReleased()) { // cek tombol 1 ditekan = rtc setup
-			showLCD(1, 0, 0, "Tombol 1 Ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
-      //rtcSetup();
-      //break;
+			rtcSetup();
+      break;
     }
-    if (button2.isPressed()) { // cek tombol 2 ditekan = no rtc setup
-			showLCD(1, 0, 0, "Tombol 2 Ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
-      //break;
+    if (button2.isReleased()) { // cek tombol 2 ditekan = no rtc setup
+			break;
     }
   }
 }
@@ -247,10 +245,10 @@ void rtcSetup() {
     showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100);
 
     // cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC
-    if (button1.isPressed() && button2.isPressed()) { 
+    if (button1.isReleased() && button2.isReleased()) { 
       showLCD(1, 0, 0, "Setting RTC Done", 0, 1, String(hour) + ":" + String(minute) + ":" + String(second), 0, 2, "Tekan 1 Lanjut", 0, 3, "", 100);
       while(1) {
-        if (button1.isPressed()){
+        if (button1.isReleased()){
           break;
         }
       }
@@ -258,7 +256,7 @@ void rtcSetup() {
     }
 
     // cek tombol 1 ditekan? jika iya, naikkan nilai hour / minute / second tergantung nilai kursor
-    if (button1.isPressed()) {
+    if (button1.isReleased()) {
       if (cursorStatus == 1) {
         hour = hour + 1;
         if (hour > 23) {
@@ -283,7 +281,7 @@ void rtcSetup() {
     }
 
     // cek tombol 2 ditekan? jika iya naikkan nilai kursor
-    if (button2.isPressed()) {
+    if (button2.isReleased()) {
       cursorStatus = cursorStatus + 1;
       if (cursorStatus > 3) {
         cursorStatus = 1;

@@ -90,15 +90,12 @@ void setup(){
   Serial.println(F("********************"));
   Serial.println(F("Program Pengatur Suhu Ruangan Otomatis berbasis Arduino dan DHT22"));
   showLCD(1, 0, 0, "Program Pengatur", 0, 1, "Suhu Ruangan", 0, 2, "Otomatis Berbasis", 0, 3, "Arduino Mega", 2500);
+
+	cek_tombol(); // menunggu tombol rtc setting ditekan atau tidak
 }
 
 // fungsi loop
 void loop() {
-  button1.loop();
-  button2.loop();
-
-  cek_tombol(); // menunggu tombol rtc setting ditekan atau tidak
-
   time_now = millis(); // ambil waktu mili second sekarang
   showLCD(1, 0, 0, "", 0, 1, "", 0, 2, "", 0, 3, "", 1); // clear tampilan lcd
 
@@ -221,12 +218,12 @@ void set_ac_off() {
 
 // fungsi untuk cek apakah masuk rtc setup atau tidak
 void cek_tombol() {
-	button1.loop();
-  button2.loop();
-
   Serial.println(F("Tekan tombol 1 untuk Setting RTC dan 2 untuk Lanjut"));
   showLCD(1, 0, 0, "Tekan 1: Set RTC", 0, 1, "Tekan 2: Lanjut", 0, 2, "", 0, 3, "", 1000);
   while(1) {
+		button1.loop();
+		button2.loop();
+
     if (button1.isReleased()) { // cek tombol 1 ditekan = rtc setup
 			showLCD(1, 0, 0, "Tombol 1 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
 			//rtcSetup();
@@ -247,6 +244,9 @@ void rtcSetup() {
   int second = 0;
 
   while(1) {
+		button1.loop();
+		button2.loop();
+		
     showLCD(1, 0, 0, "RTC Setting", 0, 1, "Hour: " + String(hour), 0, 2, "Minute: " + String(minute), 0, 3, "Second: " + String(second), 100);
 
     // cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC

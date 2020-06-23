@@ -75,12 +75,6 @@ void setup(){
   SD.begin();
 
 	rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-	
-  // set waktu RTC dengan waktu compile ketika RTC kehilangan daya
-  if (rtc.lostPower()) {
-    Serial.println("RTC lost power, let's set the time!");
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
-  }
 
   // tampilan awal
   Serial.println("");
@@ -185,6 +179,8 @@ void simpanSD(String dataSimpan){
 
 // fungsi untuk atur suhu AC
 void set_ac(int atur_ac){
+	irsend.sendRaw(ON, sizeof(ON) / sizeof(ON[0]), khz);
+	delay(1000);
   if (atur_ac <= 16){
     atur_ac = 1;
   }
@@ -196,21 +192,21 @@ void set_ac(int atur_ac){
   }
 
   switch(atur_ac){
-    case 1: irsend.sendRaw(ON_16, sizeof(OFF)/sizeof(int),khz); break;
-    case 2: irsend.sendRaw(ON_17, sizeof(OFF)/sizeof(int),khz); break;
-    case 3: irsend.sendRaw(ON_18, sizeof(OFF)/sizeof(int),khz); break;
-    case 4: irsend.sendRaw(ON_19, sizeof(OFF)/sizeof(int),khz); break;
-    case 5: irsend.sendRaw(ON_20, sizeof(OFF)/sizeof(int),khz); break;
-    case 6: irsend.sendRaw(ON_21, sizeof(OFF)/sizeof(int),khz); break;
-    case 7: irsend.sendRaw(ON_22, sizeof(OFF)/sizeof(int),khz); break;
-    case 8: irsend.sendRaw(ON_23, sizeof(OFF)/sizeof(int),khz); break;
-    case 9: irsend.sendRaw(ON_24, sizeof(OFF)/sizeof(int),khz); break;
-    case 10: irsend.sendRaw(ON_25, sizeof(OFF)/sizeof(int),khz); break;
-    case 11: irsend.sendRaw(ON_26, sizeof(OFF)/sizeof(int),khz); break;
-    case 12: irsend.sendRaw(ON_27, sizeof(OFF)/sizeof(int),khz); break;
-    case 13: irsend.sendRaw(ON_28, sizeof(OFF)/sizeof(int),khz); break;
-    case 14: irsend.sendRaw(ON_29, sizeof(OFF)/sizeof(int),khz); break;           
-    case 15: irsend.sendRaw(ON_30, sizeof(OFF)/sizeof(int),khz); break;
+    case 1: irsend.sendRaw(ON_16, sizeof(ON_16) / sizeof(ON_16[0]), khz); delay(1000); break;
+    case 2: irsend.sendRaw(ON_17, sizeof(ON_17) / sizeof(ON_17[0]), khz); delay(1000); break;
+    case 3: irsend.sendRaw(ON_18, sizeof(ON_18) / sizeof(ON_18[0]), khz); delay(1000); break;
+    case 4: irsend.sendRaw(ON_19, sizeof(ON_19) / sizeof(ON_19[0]), khz); delay(1000); break;
+    case 5: irsend.sendRaw(ON_20, sizeof(ON_20) / sizeof(ON_20[0]), khz); delay(1000); break;
+    case 6: irsend.sendRaw(ON_21, sizeof(ON_21) / sizeof(ON_21[0]), khz); delay(1000); break;
+    case 7: irsend.sendRaw(ON_22, sizeof(ON_22) / sizeof(ON_22[0]), khz); delay(1000); break;
+    case 8: irsend.sendRaw(ON_23, sizeof(ON_23) / sizeof(ON_23[0]), khz); delay(1000); break;
+    case 9: irsend.sendRaw(ON_24, sizeof(ON_24) / sizeof(ON_24[0]), khz); delay(1000); break;
+    case 10: irsend.sendRaw(ON_25, sizeof(ON_25) / sizeof(ON_25[0]), khz); delay(1000); break;
+    case 11: irsend.sendRaw(ON_26, sizeof(ON_26) / sizeof(ON_26[0]), khz); delay(1000); break;
+    case 12: irsend.sendRaw(ON_27, sizeof(ON_27) / sizeof(ON_27[0]), khz); delay(1000); break;
+    case 13: irsend.sendRaw(ON_28, sizeof(ON_28) / sizeof(ON_28[0]), khz); delay(1000); break;
+    case 14: irsend.sendRaw(ON_29, sizeof(ON_29) / sizeof(ON_29[0]), khz); delay(1000); break;           
+    case 15: irsend.sendRaw(ON_30, sizeof(ON_30) / sizeof(ON_30[0]), khz); delay(1000); break;
   }
 }
 
@@ -228,18 +224,18 @@ void cek_tombol() {
 		button2.loop();
 
     if (button1.isReleased()) { // cek tombol 1 ditekan = rtc setup
-			showLCD(1, 0, 0, "Tombol 1 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
+			//showLCD(1, 0, 0, "Tombol 1 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
 			rtcSetup();
       break;
     }
     if (button2.isReleased()) { // cek tombol 2 ditekan = no rtc setup
-			showLCD(1, 0, 0, "Tombol 2 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
+			//showLCD(1, 0, 0, "Tombol 2 ditekan", 0, 1, "", 0, 2, "", 0, 3, "", 1000);
 			break;
     }
   }
 }
 
-// fungsu untuk setting rtc
+// fungsi untuk setting rtc
 void rtcSetup() {
   int cursorStatus = 1;
   int hour = 0;

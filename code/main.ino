@@ -74,13 +74,8 @@ void setup(){
   rtc.begin();
   SD.begin();
 
-  // mencatat waktu compile
-  /*Serial.print("Compiled Time: ");
-  setDate = __DATE__;
-  setTime = __TIME__;
-  Serial.print(F(__DATE__));
-  Serial.println(F(__TIME__));*/
-
+	rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+	
   // set waktu RTC dengan waktu compile ketika RTC kehilangan daya
   if (rtc.lostPower()) {
     Serial.println("RTC lost power, let's set the time!");
@@ -141,7 +136,7 @@ void loop() {
 
   // tampilan pada LCD
   showLCD(1, 0, 0, "Date: " + date, 0, 1, "Time: " + time, 0, 2, "Hum : " + String(h) + "%", 0, 3, "Temp: " + String(t) + "*C", 1);
-  showLCD(0, 0, 0, "", 0, 1, "", 0, 2, "", 11, 3, "AC: " + suhu_ac_C, 1);
+  showLCD(0, 0, 0, "", 0, 1, "", 0, 2, "", 11, 3, "AC:" + suhu_ac_C, 1);
 
   dataSimpan = date + ";" + time + ";" + String(h) + ";" + String(t) + ";" + String(atur_ac); // mengisi variable dataSimpan dengan data yang akan disimpan pada SDCard
   simpanSD(dataSimpan); // memanggil fungsi simpanSD dengan argument nilai dataSimpan

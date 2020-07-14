@@ -335,6 +335,66 @@ void rtcSetup()
   int hour = 0;
   int minute = 0;
   int second = 0;
+  int year = 1990;
+  int month = 0;
+  int day = 0;
+
+  while (1)
+  {
+    button1.loop();
+    button2.loop();
+
+    showLCD(1, 0, 0, "RTC Setting", 0, 1, "Year: " + String(year), 0, 2, "Month: " + String(month), 0, 3, "Day: " + String(day), 100);
+
+    // cek tombol 1 dan 2 ditekan bersama, untuk keluar dari mode setup RTC
+    if (button1.isReleased() && button2.isReleased())
+    {
+      showLCD(1, 0, 0, "Setting RTC Done", 0, 1, String(year) + ":" + String(month) + ":" + String(day), 0, 2, "Tekan 1 & 2", 0, 3, "", 100);
+      while (1)
+      {
+        if (button1.isReleased())
+        {
+          break;
+        }
+      }
+      break;
+    }
+
+    // cek tombol 1 ditekan? jika iya, naikkan nilai hour / minute / second tergantung nilai kursor
+    if (button1.isReleased())
+    {
+      if (cursorStatus == 1)
+      {
+        year = year + 1;
+      }
+      if (cursorStatus == 2)
+      {
+        month = month + 1;
+        if (month > 12)
+        {
+          month = 1;
+        }
+      }
+      if (cursorStatus == 3)
+      {
+        day = day + 1;
+        if (day > 31)
+        {
+          day = 1;
+        }
+      }
+    }
+
+    // cek tombol 2 ditekan? jika iya naikkan nilai kursor
+    if (button2.isReleased())
+    {
+      cursorStatus = cursorStatus + 1;
+      if (cursorStatus > 3)
+      {
+        cursorStatus = 1;
+      }
+    }
+  }
 
   while (1)
   {
@@ -397,7 +457,8 @@ void rtcSetup()
     }
   }
 
-  DateTime now = rtc.now(); // mengambil waktu RTC
+  //DateTime now = rtc.now(); // mengambil waktu RTC
   // rtc.adjust(DateTime(2014, 1, 21, 3, 0, 0));
-  rtc.adjust(DateTime(now.year(), now.month(), now.day(), hour, minute, second));
+  //rtc.adjust(DateTime(now.year(), now.month(), now.day(), hour, minute, second));
+  rtc.adjust(DateTime(year, month, day, hour, minute, second));
 }

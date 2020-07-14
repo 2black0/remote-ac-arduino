@@ -73,7 +73,18 @@ void setup()
   lcd.backlight();
   dht.begin();
   rtc.begin();
-  SD.begin();
+  //SD.begin();
+  Serial.print("Inisialisasi SD Card");
+  showLCD(1, 0, 0, "Inisialisasi", 0, 1, "SD Card", 0, 2, "", 0, 3, "", 1000);
+  if (!SD.begin(10))
+  {
+    Serial.println("Inisialisasi Gagal!");
+    showLCD(1, 0, 0, "Inisialisasi", 0, 1, "Gagal", 0, 2, "", 0, 3, "", 1000);
+    while (1)
+      ;
+  }
+  Serial.println("Inisialisasi Selesai");
+  showLCD(1, 0, 0, "Inisialisasi", 0, 1, "Selesai", 0, 2, "", 0, 3, "", 1000);
 
   rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
@@ -195,10 +206,12 @@ void simpanSD(String dataSimpan)
     dataFile.println(dataSimpan);
     dataFile.close();
     Serial.println(F("Save data to logger.txt in SDCard"));
+    showLCD(1, 0, 0, "Simpan Data", 0, 1, "ke logger.txt", 0, 2, "", 0, 3, "", 1000);
   }
   else
   {
     Serial.println(F("Error opening logger.txt"));
+    showLCD(1, 0, 0, "Error", 0, 1, "ke logger.txt", 0, 2, "", 0, 3, "", 1000);
   }
 }
 
